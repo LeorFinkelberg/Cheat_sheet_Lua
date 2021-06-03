@@ -49,13 +49,48 @@ print(fact(a))
 
 Для выхода из интерактивного режима и интерпретатора следует набрать управляющий символ конца файла (\textsf{Ctrl+D} в UNIX, \textsf{Ctrl+Z} в Windows) или вызвать функцию \texttt{exit} из библиотеки операционной системы -- для этого нужно набрать \texttt{os.exit()}.
 
+Выполнять куски кода в интерактивном режиме можно с помощью функции \texttt{dofile}. Например
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+-- lib.lua
+function norm(x, y)
+  return math.sqrt(x^2 + y^2)
+end
+
+function twice(x)
+  return 2*x
+end
+
+-- интерактивная оболочка
+> dofile("lib.lua")
+> n = norm(3, 4) --> 5.0
+\end{lstlisting}
+
+Lua поддерживает однострочные комментраии (\verb|--|) и блочные многострочные \verb|--[[...--]]|
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+--[[
+  print(10) -- ничего не происходит
+--]]
+
+---[[
+  print(10) --> 10
+--]]
+\end{lstlisting}
+
+В первом случае обычный блочный комментарий, а во втором -- блок начинается с обычного однострочного комментария (\verb|--|), поэтому все, код выполняется.
+
 
 
 %\listoffigures\addcontentsline{toc}{section}{Список иллюстраций}
 
 % Источники в "Газовой промышленности" нумеруются по мере упоминания 
 \begin{thebibliography}{99}\addcontentsline{toc}{section}{Список литературы}
-	\bibitem{hostmann:scala-2013}{{\emph{Иерузалимски Р.} Программирование на языке Lua, 2013. -- 413~с. }
+	\bibitem{hostmann:scala-2013}{\emph{Иерузалимски Р.} Программирование на языке Lua, 2013. -- 413~с. }
 \end{thebibliography}
 
 \end{document}
