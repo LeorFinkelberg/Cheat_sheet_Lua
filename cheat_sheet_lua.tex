@@ -1,0 +1,61 @@
+\documentclass[%
+	11pt,
+	a4paper,
+	utf8,
+	%twocolumn
+		]{article}	
+
+\usepackage{style_packages/podvoyskiy_article_extended}
+
+
+\begin{document}
+\title{Заметки. Практика использования и наиболее полезные конструкции языка \texttt{Lua}}
+
+\author{\itshape Подвойский А.О.}
+
+\date{}
+\maketitle
+
+\thispagestyle{fancy}
+
+Здесь приводятся заметки по некоторым вопросам, касающимся программирования на языке \texttt{Lua} в контексте работы с системой компьютерной верстки \LaTeX.
+
+
+%\shorttableofcontents{Краткое содержание}{1}
+
+\tableofcontents
+
+\section{Начало работы}
+
+Lua не нужен разделитель между идущими подряд операторами, но в принципе можно использовать точку с запятой, если хочется. Обычно точку с запятой ставят только, если требуется разделить два и более операторов, записанных в одной строке. Переводы строк не играют никакой роли в синтаксисе Lua.
+
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+-- определяет функция факториала
+function fact(n)
+  if n == 0 then
+    return 1
+  else
+    return n * fact(n - 1)
+  end
+end
+
+print("Enter a number:")
+a = io.read("*n") -- считывает число
+print(fact(a))
+\end{lstlisting}
+
+Для выхода из интерактивного режима и интерпретатора следует набрать управляющий символ конца файла (\textsf{Ctrl+D} в UNIX, \textsf{Ctrl+Z} в Windows) или вызвать функцию \texttt{exit} из библиотеки операционной системы -- для этого нужно набрать \texttt{os.exit()}.
+
+
+
+%\listoffigures\addcontentsline{toc}{section}{Список иллюстраций}
+
+% Источники в "Газовой промышленности" нумеруются по мере упоминания 
+\begin{thebibliography}{99}\addcontentsline{toc}{section}{Список литературы}
+	\bibitem{hostmann:scala-2013}{{\emph{Иерузалимски Р.} Программирование на языке Lua, 2013. -- 413~с. }
+\end{thebibliography}
+
+\end{document}
