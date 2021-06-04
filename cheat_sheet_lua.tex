@@ -23,9 +23,9 @@
 
 %\shorttableofcontents{Краткое содержание}{1}
 
-\tableofcontents
+%\tableofcontents
 
-\section{Начало работы}
+\section{Общие замечания}
 
 Lua не нужен разделитель между идущими подряд операторами, но в принципе можно использовать точку с запятой, если хочется. Обычно точку с запятой ставят только, если требуется разделить два и более операторов, записанных в одной строке. Переводы строк не играют никакой роли в синтаксисе Lua.
 
@@ -68,7 +68,7 @@ end
 > n = norm(3, 4) --> 5.0
 \end{lstlisting}
 
-Lua поддерживает однострочные комментраии (\verb|--|) и блочные многострочные \verb|--[[...--]]|
+Неопределенные переменные возвращают nil. Lua поддерживает однострочные комментраии (\verb|--|) и блочные многострочные \verb|--[[...--]]|
 \begin{lstlisting}[
 style = lua,
 numbers = none	
@@ -83,6 +83,248 @@ numbers = none
 \end{lstlisting}
 
 В первом случае обычный блочный комментарий, а во втором -- блок начинается с обычного однострочного комментария (\verb|--|), поэтому все, код выполняется.
+
+Тип \texttt{nil} -- это тип с единственным значением, основная задача которого состоит в том, чтобы отличаться ото всех остальных значений. Lua использует nil как \emph{нечто}, \emph{не являющееся значением}, чтобы изобразить отсутствие подходящего значения.
+
+ЗАМЕЧАНИЕ: Проверки условий считают \texttt{nil} и булево \texttt{false} ложными, а все прочие значения истинными. В частности, при проверках условий Lua считает ноль и пустую строку истинными значениями.
+
+Тип \texttt{number} представляет \emph{вещественные числа}, т.е. числа двойной точности с плавающей точкой (тип double в C). В Lua нет целочисленного типа (тип integer в C).
+
+У целых чисел есть точное представление и потому нет ошибок округления. 
+
+Узнать длину строки можно с помощью \emph{оператора длины} (\verb|#|)
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+print(#"python") --> 6
+\end{lstlisting}
+
+Для определения границ строковых литералов можно использовать как одинарные, так и двойные кавычки
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+a = "a line"
+b = 'another line'
+c = [[
+  multilines
+]]
+\end{lstlisting}
+
+\section{Шпаргалка}
+
+\subsection{Условия и циклы}
+
+Цикл \texttt{while}
+\begin{lstlisting}[
+style = lua,
+numbers = none
+]
+num = 42
+
+while num < 50 do
+  num = num + 1 -- составных операторов типа `+=` нет
+end
+\end{lstlisting}
+
+Условия
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+if num > 40 then
+  print("over 40")
+elseif s ~= "walternate" then -- ~= это `не равно`; проверка на равенство выполняется как в Python с помощью `==`
+  io.write("not over 40\n") -- по умолчанию выводит в stdout
+else
+  -- по умолчанию переменные глобальные
+  thisGlobal = 5
+  -- для того чтобы сделать переменную локальной
+  local line = io.read() -- читает строку из stdin
+  -- строки можно склеить с помощью оператора `..`
+  print("Winter is coming, " .. line)
+end
+\end{lstlisting}
+
+Цикл \texttt{for}
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+karlSum = 0
+for i = 1, 100 do -- диапазон включает и левую, и правую границу
+  karlSum = karlSum + i
+end
+
+-- чтобы переменная цикла принимала значения от большего к меньшему
+fredSum = 0
+for j = 100, 1, -1 do fredSum = fredSum + j end
+\end{lstlisting}
+
+Цикл \texttt{repeat}
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+repeat
+  print("The way of the future")
+  num = num - 1
+until num == 0
+\end{lstlisting}
+
+\subsection{Функции}
+
+\begin{lstlisting}[
+style = lua,
+numbers = none
+]
+function fib(n)
+  if n < 2 then
+    return 1
+  else
+    return fib(n - 2) + fib(n - 1)
+  end
+end
+\end{lstlisting}
+
+Замыкания (вложенные функции) и анонимные функции
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+function adder(x)
+  -- вложенная анонимная функция создается, когда вызывается adder, и запоминает x
+  return function (y) return x + y end -- анонимная функция
+end
+
+a1 = adder(9)
+a2 = adder(36)
+
+print(a1(16)) --> 25
+print(a2(64)) --> 100
+\end{lstlisting}
+
+Функции могут быть локальными и глобальными
+\begin{lstlisting}[
+style = lua,
+numbers = none
+]
+-- одно и тоже
+function f(x) return x * x end
+f = function (x) return x * x end
+
+-- и это тоже
+local function g(x) return math.sin(x) end
+local g; g = function (x) return math.sin(x) end
+-- 
+\end{lstlisting}
+
+\section{Таблицы}
+
+Таблицы в Lua представляют собой ассоциативные массивы. Ключи таблиц по умолчанию имеют строковый тип
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+t = {key1 = "value1", key2 = false} -- таблица; как словарь в Python
+
+print(t.key1) --> "value1"
+t.newKey = {} -- добавить новую пару "ключ-значение"
+t.key2 = nil -- удалить ключ key2 из таблицы
+
+-- можно передать значение в функцию динамически, на ходу создавая таблицу
+function h(x)
+  return x.key1
+end
+
+print(h{ key1 = "value" }) --> 'value'
+
+-- итерации по таблице
+for key, value in pairs(u) do
+  print(key, value)
+end
+\end{lstlisting}
+
+Использование таблиц как списков / массивов
+\begin{lstlisting}[
+style = lua,
+numbers = none
+]
+v = {"value1", "value2", 1.21, "gigawatts"} -- здесь неявно ключами значений становятся целочисленные ключи
+
+for i = 1, #v do
+  print(v[i])
+end
+\end{lstlisting}
+
+\section{Метатаблицы и метаметоды}
+
+Таблица может иметь метатаблицу, с помощью которой можно перегружать операторы и тем самым менять их поведение
+\begin{lstlisting}[
+style = lua,
+numbers = none	
+]
+f1 = {a = 1, b = 2}
+f2 = {a = 2, b = 3}
+
+metafraction = {}
+function metafraction.__add(f1, f2)
+  sum = {}
+  sum.b = f1.b * f2.b
+  sum.a = f1.a * f2.b + f2.a * f1.b
+  return sum
+end
+
+setmetatable(f1, metafraction)
+setmetatable(f2, metafraction)
+
+s = f1 + f2 -- вызовет __add(f1, f2)
+\end{lstlisting}
+
+Таблицы можно расширять
+\begin{lstlisting}[
+style = lua,
+numbers = none
+]
+defaultFavs = {animal = "gru", food = "donuts"}
+myFavs = {food = "pizza"}
+setmetatable(myFavs, {__index = defaultFavs})
+eatenBy = myFavs.animal --> 'gru'
+\end{lstlisting}
+
+\verb|__add|, \verb|__index| и пр. называют метаметодами. Вот полный список метаметодов
+\begin{itemize}
+	\item \verb|__add(a, b)|: \texttt{a + b},
+	
+	\item \verb|__sub(a, b)|: \texttt{a - b},
+	
+	\item \verb|__mul(a, b)|: \texttt{a * b},
+	
+	\item \verb|__div(a, b)|: \texttt{a / b},
+	
+	\item \verb|__mod(a, b)|: \texttt{a \% b},
+	
+	\item \verb|__pow(a, b)|: \verb|a ^ b|,
+	
+	\item \verb|__unm(a)|: \verb|-a|,
+	
+	\item \verb|__concat(a, b)|: \verb|a .. b|,
+	
+	\item \verb|__len(a)|: \verb|#a|,
+	
+	\item \verb|__eq(a, b)|: \verb|a == b|,
+	
+	\item \verb|__lt(a, b)|: \verb|a < b|,
+	
+	\item \verb|__le(a, b)|: \verb|a <= b|,
+	
+	\item \verb|__index(a, b)|: \verb|a.b|,
+	
+	\item \verb|__newindex(a, b)|: \verb|a.b = c|,
+	
+	\item \verb|__call(a, ...)|: \verb|a(...)|.
+\end{itemize}
 
 
 
